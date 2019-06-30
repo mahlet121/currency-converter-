@@ -130,17 +130,20 @@ box-sizing: border-box;
   <div id="cont">
    	<h1>The World's Trusted Currency Authority</h1>
    	<div id="have">
-    <input type="search" name="have" class="money" id="haveid">
-   		<div ><select id="havetest" class="money" ></select></div>
+    <input type="number" placeholder="1" class="money" id="haveid" type="submit" value=1>
+   		<div ><select id="havetest" class="money" ><option value="USD">USD</option></select></div>
       <i class="fas fa-exchange-alt fa-3x" id="arrow"></i>
-   		<div ><select id="wtest" class="money"></select></div>
-      <button id="submit"><i class="fas fa-chevron-right"></i></button>
+   		<div ><select id="wtest" class="money"><option value="CAD">CAD</option></select></div>
+      <button id="submit" onclick="Input()"><i class="fas fa-chevron-right"></i></button>
+      <div id="display"></div>
    		
    	</div>
  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="money.js"></script>
   <script type="text/javascript">
+  
     queryURL ="https://gist.githubusercontent.com/mddenton/062fa4caf150bdf845994fc7a3533f74/raw/b0d1722b04b0a737aade2ce6e055263625a0b435/Common-Currency.json";
     $.ajax({
       url: queryURL,
@@ -155,9 +158,9 @@ box-sizing: border-box;
       for(x in result){
            name += result[x] + "<br>";
           code += result[x] + "<br>";
-      
-           $("#havetest").append("<option>"+result[x].code+" "+" "+result[x].name+"</option>");
-          $("#wtest").append("<option>"+result[x].code+" "+result[x].name+"</option>");
+           
+           $("#havetest").append("<option>"+result[x].code+"</option>");
+          $("#wtest").append("<option>"+result[x].code+"</option>");
        
      }
 
@@ -165,6 +168,46 @@ box-sizing: border-box;
       });
      
   });
+   
+function Input() {
+  var amount = document.getElementById("haveid").value;
+
+   var need = document.getElementById("havetest").value;
+   var fromdata = document.getElementById("wtest").value;
+
+   console.log(fromdata);
+
+  
+
+    $.getJSON(
+      // NB: using Open Exchange Rates here, but you can use any source!
+        'http://data.fixer.io/api/latest?access_key=734330377a3dc5aba22eddb148190ee2',
+        function(data) {
+         
+            // Check money.js has finished loading:
+            if ( typeof fx !== "undefined" && fx.rates ) {
+                fx.rates = data.rates;
+                fx.base = data.base;
+            } else {
+                // If not, apply to fxSetup global:
+                var fxSetup = {
+                    rates : data.rates,
+                    base : data.base
+                }
+                
+           
+            }
+             console.log(data.rates);
+          var value = parseInt(amount);
+          var target=need;
+          var want=fromdata;
+          var convertedValue = fx(value).from(want).to(target);
+   $("#display").html("<h2>"+value+" "+target+" "+"="+"<h1>"+convertedValue+"</h1>"+""+want+"</h2>");
+           console.log(convertedValue);
+        }
+    );
+
+}
 
       
      
